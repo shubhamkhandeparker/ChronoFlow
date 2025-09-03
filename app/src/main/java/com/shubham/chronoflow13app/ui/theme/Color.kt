@@ -15,3 +15,5 @@ val Orange = Color(0xFFFFA500)
 val DarkGray = Color(0xFF1C1C1E)
 
 val LightGray = Color(0xFFD3D3D3)
+
+val ButtonGray = Color(0xFF2E2E2E)

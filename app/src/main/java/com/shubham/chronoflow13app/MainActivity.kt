@@ -15,7 +15,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.shubham.chronoflow13app.presentation.screens.StopwatchScreen
 import com.shubham.chronoflow13app.ui.theme.ChronoFlow13AppTheme
 import com.shubham.chronoflow13app.ui.theme.DarkGray
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
