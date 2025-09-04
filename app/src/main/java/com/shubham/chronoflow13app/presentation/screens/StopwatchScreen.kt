@@ -28,7 +28,7 @@ import kotlinx.coroutines.flow.asStateFlow
 fun StopwatchScreen(
     viewModel: StopwatchViewModel = hiltViewModel()
 ) {
-    val formattedTime by viewModel.formatedTime.collectAsState()
+    val formattedTime by viewModel.formattedTime.collectAsState()
     val isRunning by viewModel.isRunning.collectAsState()
     val laps by viewModel.laps.collectAsState()
 

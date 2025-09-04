@@ -1,7 +1,10 @@
 package com.shubham.chronoflow13app.viewmodel
 
+import android.app.Application
+import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.shubham.chronoflow13app.domain.service.StopwatchService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -13,7 +16,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class StopwatchViewModel @Inject constructor() : ViewModel() {
+class StopwatchViewModel @Inject constructor(private val application: Application) : ViewModel() {
 
 
     private val _timeMillis = MutableStateFlow(0L)
@@ -25,7 +28,7 @@ class StopwatchViewModel @Inject constructor() : ViewModel() {
     private val _laps = MutableStateFlow<List<String>>(emptyList())
     val laps = _laps.asStateFlow()
 
-    val formatedTime = timeMillis.map { millis ->
+    val formattedTime = timeMillis.map { millis ->
         val totalSeconds = millis / 1000
         val minutes = (totalSeconds / 60).toString().padStart(2, '0')
         val seconds = (totalSeconds % 60).toString().padStart(2, '0')
@@ -46,6 +49,8 @@ class StopwatchViewModel @Inject constructor() : ViewModel() {
             return
         }
 
+        val intent = Intent(application, StopwatchService::class.java)
+        application.startService(intent)
 
         _isRunning.value = true
         timerJob = viewModelScope.launch {
@@ -64,8 +69,8 @@ class StopwatchViewModel @Inject constructor() : ViewModel() {
     }
 
     fun lap() {
-        if (_isRunning.value) return      //can't lap if the timer isn't running
-        val currentLapTime = formatedTime.value
+        if (!_isRunning.value) return      //can't lap if the timer isn't running
+        val currentLapTime = formattedTime.value
         val lapNumber = (_laps.value.size + 1).toString().padStart(2, '0')
         _laps.value = listOf("Lap $lapNumber:$currentLapTime")  + _laps.value       //Adding new lap to the list
     }
