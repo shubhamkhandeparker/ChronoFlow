@@ -5,82 +5,73 @@ import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shubham.chronoflow13app.domain.service.StopwatchService
+import com.shubham.chronoflow13app.presentation.screens.StopwatchScreen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.shubham.chronoflow13app.common.Constants.ACTION_PAUSE
+import com.shubham.chronoflow13app.common.Constants.ACTION_RESET
+import com.shubham.chronoflow13app.common.Constants.ACTION_START
+import com.shubham.chronoflow13app.common.Constants.ACTION_LAP
+
 
 @HiltViewModel
-class StopwatchViewModel @Inject constructor(private val application: Application) : ViewModel() {
+class StopwatchViewModel @Inject constructor(
+    private val application: Application
+) : ViewModel() {
 
+    //Exposing the state directly from the service's companion object
+    val isRunning = StopwatchService.isRunning
+    val timeMillis = StopwatchService.timeMillis
+    val laps = StopwatchService.laps
 
-    private val _timeMillis = MutableStateFlow(0L)
-    val timeMillis = _timeMillis.asStateFlow()
-
-    private val _isRunning = MutableStateFlow(false)
-    val isRunning = _isRunning.asStateFlow()
-
-    private val _laps = MutableStateFlow<List<String>>(emptyList())
-    val laps = _laps.asStateFlow()
-
+    //The formattedTime logic can now line here again based on the service's timeMillis
     val formattedTime = timeMillis.map { millis ->
         val totalSeconds = millis / 1000
         val minutes = (totalSeconds / 60).toString().padStart(2, '0')
         val seconds = (totalSeconds % 60).toString().padStart(2, '0')
         val centiSeconds = (millis % 1000 / 10).toString().padStart(2, '0')
         "$minutes:$seconds.$centiSeconds"
-    }.stateIn(
-        scope = viewModelScope,
-        started = kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000),
-        initialValue = "00:00.00"
-    )
 
-
-    private var timerJob: Job? = null
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "00:00.00")
 
     fun start() {
-        if (_isRunning.value) {  //if it's running treat it as pause
-            pause()
-            return
-        }
+        val intent = Intent(application, StopwatchService::class.java).also {
+            it.action = ACTION_START
+            application.startService(it)
 
-        val intent = Intent(application, StopwatchService::class.java)
-        application.startService(intent)
-
-        _isRunning.value = true
-        timerJob = viewModelScope.launch {
-            val startTime = System.currentTimeMillis() - _timeMillis.value
-            while (true) {
-                _timeMillis.value = System.currentTimeMillis() - startTime
-                delay(10L)  //Update every 10 milliSeconds
-            }
         }
     }
 
 
     fun pause() {
-        _isRunning.value = false
-        timerJob?.cancel()
+        Intent(application, StopwatchService::class.java).also {
+            it.action = ACTION_PAUSE
+            application.startService(it)
+        }
+
+    }
+
+
+    fun reset() {
+        Intent(application, StopwatchService::class.java).also {
+            it.action = ACTION_RESET
+            application.startService(it)
+        }
     }
 
     fun lap() {
-        if (!_isRunning.value) return      //can't lap if the timer isn't running
-        val currentLapTime = formattedTime.value
-        val lapNumber = (_laps.value.size + 1).toString().padStart(2, '0')
-        _laps.value = listOf("Lap $lapNumber:$currentLapTime")  + _laps.value       //Adding new lap to the list
+       Intent(application, StopwatchService::class.java).also {
+           it.action = ACTION_LAP
+           application.startService(it)
+       }
     }
-
-    fun reset() {
-        _isRunning.value = false
-        timerJob?.cancel()
-        _timeMillis.value = 0L
-        _laps.value=emptyList()
-    }
-
 
 }

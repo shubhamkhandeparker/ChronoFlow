@@ -28,9 +28,12 @@ import kotlinx.coroutines.flow.asStateFlow
 fun StopwatchScreen(
     viewModel: StopwatchViewModel = hiltViewModel()
 ) {
+
     val formattedTime by viewModel.formattedTime.collectAsState()
     val isRunning by viewModel.isRunning.collectAsState()
     val laps by viewModel.laps.collectAsState()
+
+
 
 
 
@@ -57,15 +60,11 @@ fun StopwatchScreen(
                 .weight(1f)
                 .fillMaxWidth()
         ) {
-            items(laps) {lap ->
-                Text(
-                    text=lap,
-                    color = Color.White,
-                    modifier=Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp),
-                    textAlign = TextAlign.Center
-                )
+            items(laps) { lap ->
+                Text(text = lap,
+                    color=Color.White,
+                    textAlign = TextAlign.Center,
+                    modifier=Modifier.fillMaxWidth().padding(vertical = 4.dp))
             }
         }
 
@@ -76,8 +75,12 @@ fun StopwatchScreen(
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
+
             if (isRunning) {
-                ActionButton(text = "Lap", onClick = {viewModel.lap() }, backgroundColor = ButtonGray)
+                ActionButton(
+                    text = "Laps", onClick = { viewModel.lap() },
+                    backgroundColor = ButtonGray
+                )
                 ActionButton(text = "Pause", onClick = { viewModel.pause() })
             } else {
                 ActionButton(
