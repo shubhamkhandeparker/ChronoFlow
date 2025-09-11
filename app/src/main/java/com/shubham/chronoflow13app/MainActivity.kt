@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.shubham.chronoflow13app.presentation.screens.MainScreen
 import com.shubham.chronoflow13app.presentation.screens.StopwatchScreen
 import com.shubham.chronoflow13app.ui.theme.ChronoFlow13AppTheme
 import com.shubham.chronoflow13app.ui.theme.DarkGray
@@ -27,7 +28,7 @@ class MainActivity : ComponentActivity() {
                 Surface (modifier=Modifier.fillMaxSize(),
                     color = DarkGray
                 ) {
-                    StopwatchScreen()
+                    MainScreen()
                 }
             }
         }
