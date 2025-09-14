@@ -6,10 +6,9 @@ ChronoFlow is a sleek, modern timekeeping application for Android built with 100
 
 | Stopwatch | Timer | Voice Permission |
 | :---: | :---: | :---: |
-| [<img width="1080" height="2400" alt="image" src="https://github.com/user-attachments/assets/9b7dd242-701a-4fb3-aad0-515841f87cdd" />
-] | [<img width="1080" height="2400" alt="image" src="https://github.com/user-attachments/assets/5bdb08ee-c63f-47b7-9c11-57077f8a297a" />
-] | [<img width="1080" height="2400" alt="image" src="https://github.com/user-attachments/assets/16f274b6-f135-476b-9d4a-a9ad674a27ec" />
-] |
+[<img width="1080" height="2400" alt="image" src="https://github.com/user-attachments/assets/9b7dd242-701a-4fb3-aad0-515841f87cdd"/>
+[<img width="1080" height="2400" alt="image" src="https://github.com/user-attachments/assets/5bdb08ee-c63f-47b7-9c11-57077f8a297a"/>
+[<img width="1080" height="2400" alt="image" src="https://github.com/user-attachments/assets/16f274b6-f135-476b-9d4a-a9ad674a27ec"/> 
 
 ## ✨ Features
 
