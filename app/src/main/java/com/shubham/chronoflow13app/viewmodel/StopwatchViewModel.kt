@@ -20,12 +20,22 @@ import com.shubham.chronoflow13app.common.Constants.ACTION_PAUSE
 import com.shubham.chronoflow13app.common.Constants.ACTION_RESET
 import com.shubham.chronoflow13app.common.Constants.ACTION_START
 import com.shubham.chronoflow13app.common.Constants.ACTION_LAP
+import com.shubham.chronoflow13app.domain.service.VoiceRecognizerService
+import com.shubham.chronoflow13app.domain.service.VoiceRecognizerState
+import kotlinx.coroutines.flow.StateFlow
 
 
 @HiltViewModel
 class StopwatchViewModel @Inject constructor(
-    private val application: Application
+    private val application: Application,
+    private val voiceRecognizerService: VoiceRecognizerService
 ) : ViewModel() {
+
+    //3.Exposing the voice state & Adding control function
+    val voiceState : StateFlow<VoiceRecognizerState> = voiceRecognizerService.state
+    fun onVoiceCommand(){
+        voiceRecognizerService.startListening()
+    }
 
     //Exposing the state directly from the service's companion object
     val isRunning = StopwatchService.isRunning

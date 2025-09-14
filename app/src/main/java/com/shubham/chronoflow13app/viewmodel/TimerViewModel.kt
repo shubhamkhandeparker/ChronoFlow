@@ -13,6 +13,8 @@ import com.shubham.chronoflow13app.domain.timer.TimerAlarmScheduler
 import kotlin.math.min
 import com.shubham.chronoflow13app.domain.service.NotificationService
 import com.shubham.chronoflow13app.data.SettingsRepository
+import com.shubham.chronoflow13app.domain.service.VoiceRecognizerService
+import com.shubham.chronoflow13app.domain.service.VoiceRecognizerState
 
 
 @HiltViewModel
@@ -20,8 +22,15 @@ import com.shubham.chronoflow13app.data.SettingsRepository
 class TimerViewModel @Inject constructor(
     private val scheduler: TimerAlarmScheduler,
     private val notificationService: NotificationService,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val voiceRecognizerService: VoiceRecognizerService
 ) : ViewModel() {
+
+    //Exposing the voice state & adding control function
+    val voiceState: StateFlow<VoiceRecognizerState> = voiceRecognizerService.state
+    fun onVoiceCommand() {
+        voiceRecognizerService.startListening()
+    }
 
     private val _isPickerDialogShown = MutableStateFlow(false)
     val isPickerDialogShown = _isPickerDialogShown.asStateFlow()

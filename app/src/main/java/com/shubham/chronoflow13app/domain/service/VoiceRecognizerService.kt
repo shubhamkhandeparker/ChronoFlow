@@ -1,6 +1,7 @@
 package com.shubham.chronoflow13app.domain.service
 
 import android.content.Context
+import javax.inject.Singleton
 import android.content.Intent
 import android.os.Bundle
 import android.speech.RecognitionListener
@@ -24,6 +25,7 @@ sealed interface VoiceRecognizerState {
 
 }
 
+@Singleton
 class VoiceRecognizerService @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
@@ -38,7 +40,7 @@ class VoiceRecognizerService @Inject constructor(
     //This is the listener that5 translates callback to our stateFlow
     private val recognitionListener = object : RecognitionListener {
         override fun onReadyForSpeech(params: Bundle?) {
-            _state.value = VoiceRecognizerState.Error("Ready for Speech...")
+
         }
 
 
@@ -79,7 +81,7 @@ class VoiceRecognizerService @Inject constructor(
                 ?.let { text ->
                     _state.value = VoiceRecognizerState.Result(text)
                 }
-            _state.value = VoiceRecognizerState.Ready    //Reset after getting result
+           
         }
 
         override fun onPartialResults(partialResults: Bundle?) {}

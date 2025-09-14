@@ -30,7 +30,7 @@ import androidx.compose.ui.text.input.KeyboardType
 
 @Composable
 fun TimerScreen (
-    viewModel: TimerViewModel = hiltViewModel()
+    viewModel: TimerViewModel
 ) {
     val formattedTime by viewModel.formattedTime.collectAsState()
     val isRunning by viewModel.isRunning.collectAsState()

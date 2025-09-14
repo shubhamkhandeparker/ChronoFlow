@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.asStateFlow
 
 @Composable
 fun StopwatchScreen(
-    viewModel: StopwatchViewModel = hiltViewModel()
+    viewModel: StopwatchViewModel
 ) {
 
     val formattedTime by viewModel.formattedTime.collectAsState()
