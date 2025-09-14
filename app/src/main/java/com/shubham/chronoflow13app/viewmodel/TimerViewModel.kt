@@ -136,5 +136,11 @@ class TimerViewModel @Inject constructor(
 
     }
 
+    fun setDurationAndSave (durationInMillis : Long){
+        _timeDuration.value = durationInMillis
+        viewModelScope.launch {
+            settingsRepository.saveTimerDuration(durationInMillis)
+        }
+    }
 
 }

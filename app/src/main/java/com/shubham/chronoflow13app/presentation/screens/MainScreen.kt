@@ -45,11 +45,106 @@ fun MainScreen() {
     //2.getting viewModel & voice State
     val timerViewModel: TimerViewModel = hiltViewModel()
     val stopwatchViewModel: StopwatchViewModel = hiltViewModel()
-    val voiceState by if(currentRoute == BottomNavItem.Timer.route){
+    val voiceState by if (currentRoute == BottomNavItem.Timer.route) {
         timerViewModel.voiceState.collectAsState()
-    }
-    else{
+    } else {
         stopwatchViewModel.voiceState.collectAsState()
+    }
+
+    fun parseVoiceCommand(
+        command: String
+    ) {
+        val lowercaseCommand = command.lowercase(Locale.ROOT)
+
+        //Defining the keywords for action
+        val actionStart = listOf(
+            "start",
+            "begin",
+            "go",
+            "resume",
+            "continue",
+            "play",
+            "commence",
+            "launch",
+            "activate",
+            "initiate",
+            "run",
+            "kickoff",
+            "proceed",
+            "engage",
+            "trigger",
+            "set"
+        )
+        val actionStop = listOf(
+            "stop",
+            "pause",
+            "hold",
+            "wait",
+            "freeze",
+            "halt",
+            "end",
+            "break",
+            "suspend",
+            "interrupt",
+            "terminate",
+            "standby",
+            "cease",
+            "cut",
+            "abort"
+        )
+        val actionReset = listOf(
+            "reset",
+            "clear",
+            "restart",
+            "refresh",
+            "reboot",
+            "redo",
+            "wipe",
+            "restore",
+            "initialize",
+            "zero",
+            "back",
+            "erase",
+            "start over",
+            "again"
+        )
+
+        //check for target a7 then the action
+        if (lowercaseCommand.contains("timer")) {
+            //Regex to find pattern like "10 minutes" or "5 seconds",etc
+            var totalMillis = 0L
+            val regex = "(\\d+)\\s*(hour|minute|second)".toRegex()
+            val matches = regex.findAll(lowercaseCommand)
+
+
+            if(matches.any()){
+                matches.forEach { matchResult ->
+                    val (value ,unit) = matchResult.destructured
+                    val timeValue = value.toLongOrNull()?:0L
+                    when{
+                        "hour".contains(unit) -> totalMillis += timeValue * 3_600_000 //1 hour = 3,600,000
+                        "minute".contains(unit) -> totalMillis += timeValue * 60000
+                        "second".contains(unit) -> totalMillis += timeValue * 1000
+                    }
+                }
+                if(totalMillis > 0){
+                    timerViewModel.setDurationAndSave(totalMillis)
+                }
+            }
+
+            when {
+                actionStart.any { lowercaseCommand.contains(it) } && totalMillis > 0 -> timerViewModel.start()
+                actionStart.any { lowercaseCommand.contains(it) } -> timerViewModel.start()
+                actionStop.any { lowercaseCommand.contains(it) } -> timerViewModel.pause()
+                actionReset.any { lowercaseCommand.contains(it) } -> timerViewModel.reset()
+            }
+        } else if (lowercaseCommand.contains("stopwatch")) {
+            when {
+                actionStart.any { lowercaseCommand.contains(it) } -> stopwatchViewModel.start()
+                actionStop.any { lowercaseCommand.contains(it) } -> stopwatchViewModel.pause()
+                actionReset.any { lowercaseCommand.contains(it) } -> stopwatchViewModel.reset()
+            }
+        }
     }
 
     //3.React ti voice commands
@@ -57,16 +152,10 @@ fun MainScreen() {
         when (voiceState) {
             is VoiceRecognizerState.Result -> {
                 val command =
-                    (voiceState as VoiceRecognizerState.Result).text.lowercase(Locale.ROOT)
-                Log.d("VoiceCommand","Received :'$command'")
-                when {
-                    "start stopwatch" in command -> stopwatchViewModel.start()
-                    "pause stopwatch" in command -> stopwatchViewModel.pause()
-                    "reset stopwatch" in command -> stopwatchViewModel.reset()
-                    "start timer" in command -> timerViewModel.start()
-                    "pause timer" in command -> timerViewModel.pause()
-                    "reset timer" in command -> timerViewModel.reset()
-                }
+                    (voiceState as VoiceRecognizerState.Result).text
+                Log.d("VoiceCommand", "Received :'$command'")
+                //simple logic
+                parseVoiceCommand(command)
             }
             // --- THIS IS THE CRUCIAL PART YOU ARE MISSING ---
             is VoiceRecognizerState.Error -> {
@@ -111,10 +200,9 @@ fun MainScreen() {
                 onClick = {
                     if (permissionState.status.isGranted) {
                         //If we have permission , start listening
-                        if(currentRoute== BottomNavItem.Timer.route){
+                        if (currentRoute == BottomNavItem.Timer.route) {
                             timerViewModel.onVoiceCommand()
-                        }
-                        else{
+                        } else {
                             stopwatchViewModel.onVoiceCommand()
                         }
                     } else {
@@ -136,3 +224,4 @@ fun MainScreen() {
         }
     }
 }
+
