@@ -25,6 +25,9 @@ import java.util.Locale
 import android.Manifest
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import com.google.accompanist.permissions.isGranted
 
@@ -117,17 +120,17 @@ fun MainScreen() {
             val matches = regex.findAll(lowercaseCommand)
 
 
-            if(matches.any()){
+            if (matches.any()) {
                 matches.forEach { matchResult ->
-                    val (value ,unit) = matchResult.destructured
-                    val timeValue = value.toLongOrNull()?:0L
-                    when{
+                    val (value, unit) = matchResult.destructured
+                    val timeValue = value.toLongOrNull() ?: 0L
+                    when {
                         "hour".contains(unit) -> totalMillis += timeValue * 3_600_000 //1 hour = 3,600,000
                         "minute".contains(unit) -> totalMillis += timeValue * 60000
                         "second".contains(unit) -> totalMillis += timeValue * 1000
                     }
                 }
-                if(totalMillis > 0){
+                if (totalMillis > 0) {
                     timerViewModel.setDurationAndSave(totalMillis)
                 }
             }
@@ -177,44 +180,54 @@ fun MainScreen() {
     )
     Scaffold(
         containerColor = DarkGray,
-        bottomBar = {
-            NavigationBar(containerColor = DarkGray) {
-                items.forEach { item ->
-                    NavigationBarItem(
-                        icon = { Icon(item.icon, contentDescription = item.title) },
-                        label = { Text(text = item.title) },
-                        selected = currentRoute == item.route,
-                        onClick = {
-                            navController.navigate(item.route) {
-                                popUpTo(navController.graph.findStartDestination().id)
-                                launchSingleTop = true
-                            }
-                        }
+        floatingActionButtonPosition = FabPosition.Center,
 
-                    )
-                }
-            }
-        },
         floatingActionButton = {
-            FloatingActionButton(
+            SmallFloatingActionButton(
                 onClick = {
                     if (permissionState.status.isGranted) {
-                        //If we have permission , start listening
                         if (currentRoute == BottomNavItem.Timer.route) {
                             timerViewModel.onVoiceCommand()
                         } else {
                             stopwatchViewModel.onVoiceCommand()
                         }
+
                     } else {
                         permissionState.launchPermissionRequest()
                     }
                 }
             ) {
-                Icon(Icons.Default.Mic, contentDescription = "Voice command")
+                Icon(Icons.Default.Mic, contentDescription = "Voice Command")
+            }
+        },
+        bottomBar = {
+            BottomAppBar(
+                containerColor = DarkGray
+
+            ) {
+                NavigationBar(
+                    modifier = Modifier.fillMaxWidth(),
+                    containerColor = Color.Transparent
+                ) {
+                    items.forEach { item ->
+                        NavigationBarItem(
+                            icon = { Icon(item.icon, contentDescription = item.title) },
+                            label = { Text (text= item.title) },
+                            selected = currentRoute == item.route,
+                            onClick = {
+                                navController.navigate(item.route) {
+                                    popUpTo(navController.graph.findStartDestination().id)
+                                    launchSingleTop = true
+                                }
+                            }
+
+                        )
+                    }
+                }
             }
         }
-    ) { innerPadding ->
 
+    ) { innerPadding ->
         NavHost(
             navController, startDestination = BottomNavItem.Stopwatch.route,
             modifier = Modifier.padding(innerPadding)
@@ -224,4 +237,3 @@ fun MainScreen() {
         }
     }
 }
-
